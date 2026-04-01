@@ -1,7 +1,17 @@
 # Personalised AI Running Coach
 Hobby project creating an AI running coach with personalised training plans using my Strava data. The purpose of this was for personal use, and also as a practical hobby exercise working with LangChain.
 
-## Setup
+## 🗒️ Detailed notes
+- **API dependencies** - requires API keys for Strava (free) and OpenAI (paid)
+    - Note # of API calls to Strava is N+1, where N is number of runs fetched as we need the more detailed HR data per run
+- **Preprocessing of Strava data** json / dict from API is saved as SQLite database
+    - SQLite database enables standardised, performant querying by agent
+    - Data dictionary - See `database_schema.json` for schema. This is passed to the agent.
+    - Data on time / pace by HR zone:
+        - HR zones configured in `src/config.py`
+        - Includes some nicely vibe coded feature engineering to correctly reflect time / pace in HR zones, removing time standing at rest from average pace in zone
+
+## 🔧 Setup
 First, set up **Python environment**
 For Windows and in Bash, change directory to this repo and:
 1. Create Python virtual env
@@ -64,3 +74,19 @@ STRAVA_REFRESH_TOKEN=4a822ac443756ff381b712e7444084fd443c0ad2
     res = requests.post(url, data=payload)
     print(res.json())
     ```
+
+6. Other
+Please also update `src/config.py` with your personalised HR zones as needed.
+```
+# Define HR zones
+# We get the HR data from Strava API, then need your HR zone definitions below
+MAX_HEART_RATE = 200
+
+ZONES = {
+    "z1": (0, 0.6),
+    "z2": (0.6, 0.75),
+    "z3": (0.75, 0.85),
+    "z4": (0.85, 0.95),
+    "z5": (0.95, 1.0),
+}
+```

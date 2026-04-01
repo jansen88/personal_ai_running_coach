@@ -206,8 +206,6 @@ marimo/_static/
 marimo/_lsp/
 __marimo__/
 
-# Data folder
-data/
 
 # VS code stuff
 .vscode

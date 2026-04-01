@@ -1,0 +1,110 @@
+{
+  "table_name": "runs",
+  "description": "Contains running activity data fetched from Strava, with time in heart rate zones and pace per zone.",
+  "columns": [
+    {
+      "name": "id",
+      "type": "INTEGER",
+      "description": "Strava activity ID, primary key"
+    },
+    {
+      "name": "name",
+      "type": "TEXT",
+      "description": "Name of the run as recorded on Strava"
+    },
+    {
+      "name": "start_date",
+      "type": "TEXT",
+      "description": "Start date/time of the run"
+    },
+    {
+      "name": "distance",
+      "type": "REAL",
+      "units": "km",
+      "description": "Total distance of the run"
+    },
+    {
+      "name": "duration",
+      "type": "REAL",
+      "units": "minutes",
+      "description": "Total moving time of the run"
+    },
+    {
+      "name": "pace",
+      "type": "REAL",
+      "units": "min/km",
+      "description": "Average pace over the entire run"
+    },
+    {
+      "name": "elevation_gain",
+      "type": "REAL",
+      "units": "meters",
+      "description": "Total elevation gain during the run"
+    },
+    {
+      "name": "type",
+      "type": "TEXT",
+      "description": "Activity type, e.g., 'Run'"
+    },
+    {
+      "name": "time_z1",
+      "type": "REAL",
+      "units": "minutes",
+      "description": "Total time spent in HR zone 1, including stationary segments"
+    },
+    {
+      "name": "time_z2",
+      "type": "REAL",
+      "units": "minutes",
+      "description": "Total time spent in HR zone 2, including stationary segments"
+    },
+    {
+      "name": "time_z3",
+      "type": "REAL",
+      "units": "minutes",
+      "description": "Total time spent in HR zone 3, including stationary segments"
+    },
+    {
+      "name": "time_z4",
+      "type": "REAL",
+      "units": "minutes",
+      "description": "Total time spent in HR zone 4, including stationary segments"
+    },
+    {
+      "name": "time_z5",
+      "type": "REAL",
+      "units": "minutes",
+      "description": "Total time spent in HR zone 5, including stationary segments"
+    },
+    {
+      "name": "pace_z1",
+      "type": "REAL",
+      "units": "min/km",
+      "description": "Average pace in HR zone 1, excluding stationary segments"
+    },
+    {
+      "name": "pace_z2",
+      "type": "REAL",
+      "units": "min/km",
+      "description": "Average pace in HR zone 2, excluding stationary segments"
+    },
+    {
+      "name": "pace_z3",
+      "type": "REAL",
+      "units": "min/km",
+      "description": "Average pace in HR zone 3, excluding stationary segments"
+    },
+    {
+      "name": "pace_z4",
+      "type": "REAL",
+      "units": "min/km",
+      "description": "Average pace in HR zone 4, excluding stationary segments"
+    },
+    {
+      "name": "pace_z5",
+      "type": "REAL",
+      "units": "min/km",
+      "description": "Average pace in HR zone 5, excluding stationary segments"
+    }
+  ]
+}
