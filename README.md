@@ -4,12 +4,14 @@ Hobby project creating an AI running coach with personalised training plans usin
 ## 🗒️ Detailed notes
 - **API dependencies** - requires API keys for Strava (free) and OpenAI (paid)
     - Note # of API calls to Strava is N+1, where N is number of runs fetched as we need the more detailed HR data per run
+    - I didn't set this up to use other models or servers, but obviously this could be done.
 - **Preprocessing of Strava data** json / dict from API is saved as SQLite database
     - SQLite database enables standardised, performant querying by agent
     - Data dictionary - See `database_schema.json` for schema. This is passed to the agent.
     - Data on time / pace by HR zone:
         - HR zones configured in `src/config.py`
         - Includes some nicely vibe coded feature engineering to correctly reflect time / pace in HR zones, removing time standing at rest from average pace in zone
+    - TODO: Need to manage 
 
 ## 🔧 Setup
 First, set up **Python environment**
@@ -74,6 +76,11 @@ STRAVA_REFRESH_TOKEN=4a822ac443756ff381b712e7444084fd443c0ad2
     res = requests.post(url, data=payload)
     print(res.json())
     ```
+
+6. To initialise the SQLite database, check a `data` folder exists (it should if cloning this repo). If not, please create it. Then run the initalisation script
+```
+python initialise_sqlite_db.py
+```
 
 6. Other
 Please also update `src/config.py` with your personalised HR zones as needed.

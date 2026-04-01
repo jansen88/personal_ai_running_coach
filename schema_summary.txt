@@ -1,0 +1,10 @@
+Table: runs
+
+Columns:
+- start_date (text): start date of run
+- distance (float): total distance in kilometres
+- duration (float): total duration in minutes
+- pace (float): average pace per kilometre (min/km)
+- elevation_gain (float): total elevation gain
+- time_z1, time_z2, ..., time_z5 (float): time in minutes in each of the 5 heart rate zones
+- pace_z1, pace_z2, ..., pace_z5 (float): average pace (min/km) in each of the 5 heart rate zones
