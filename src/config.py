@@ -17,6 +17,19 @@ DB_PATH = os.path.join(BASE_DIR, 'data', 'strava.db')
 
 
 
+# Web pages to grab for RAG system
+WEB_URLS = [
+    "https://www.reddit.com/r/artc/comments/6qrk62/dissecting_daniels_chapter_two_physiology_of/?utm_content=title&utm_medium=user&utm_source=reddit&utm_name=u_CatzerzMcGee",
+    "https://www.reddit.com/r/artc/comments/6s7jux/dissecting_daniels_part_3_training_intensities/",
+    "https://www.mcmillanrunning.com/best-5k-workout/",
+    "https://www.reddit.com/r/running/wiki/marathon_training_plans/",
+    "https://www.halhigdon.com/training-programs/marathon-training/intermediate-2-marathon/",
+    "https://www.halhigdon.com/training-programs/marathon-training/novice-supreme/",
+    "https://www.runnersworld.com/advanced/a20819355/marathon-advantage/?page=single"
+]
+
+
+
 # Define HR zones
 # We get the HR data from Strava API, then need your HR zone definitions below
 MAX_HEART_RATE = 200
