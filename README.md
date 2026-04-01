@@ -85,14 +85,18 @@ STRAVA_REFRESH_TOKEN=4a822ac443756ff381b712e7444084fd443c0ad2
     print(res.json())
     ```
 
-6. To initialise the SQLite database, check a `data` folder exists (it should if cloning this repo). If not, please create it. Then run the initalisation script
+6. **Initialise databases** if needed
+- To initialise the SQLite database, check a `data` folder exists (it should if cloning this repo). If not, please create it. Then run the initalisation script
 ```
 python src/utils/initialise_sqlite_db.py
 ```
-
-Then to load in Strava data (if this isn't built into main pipeline yet), this can be done with:
+- To initialise the SQLite database for Strava data (this will get built into the agent, but can also be done manually):
 ```
 python src/utils/fetch_from_strava_api.py
+```
+- To initialise the Chroma vector database of running knowledge (from web pages):
+```
+python src/utils/create_vector_store.py
 ```
 
 
