@@ -1,17 +1,24 @@
 # Personalised AI Running Coach
 Hobby project creating an AI running coach with personalised training plans using my Strava data. The purpose of this was for personal use, and also as a practical hobby exercise working with LangChain.
 
+## Overview
+To fill in
+
 ## 🗒️ Detailed notes
 - **API dependencies** - requires API keys for Strava (free) and OpenAI (paid)
     - Note # of API calls to Strava is N+1, where N is number of runs fetched as we need the more detailed HR data per run
     - I didn't set this up to use other models or servers, but obviously this could be done.
-- **Preprocessing of Strava data** json / dict from API is saved as SQLite database
+- **Preprocessing of Strava data** - dictionary returned from API is saved as SQLite database
     - SQLite database enables standardised, performant querying by agent
     - Data dictionary - See `database_schema.json` for schema. This is passed to the agent.
     - Data on time / pace by HR zone:
         - HR zones configured in `src/config.py`
-        - Includes some nicely vibe coded feature engineering to correctly reflect time / pace in HR zones, removing time standing at rest from average pace in zone
-    - TODO: Need to manage 
+        - Some (vibe coded) effort has gone into summarising statistics by HR zone, to provide better information for the agent to work with.
+- **Agent**
+    - Development log:
+        | Agent description | Tools | Improvements made | What it was able to do | Reference |
+        | --- | --- | --- | --- | --- |
+        | Simple agent, chatbot able to query Strava data | `execute_sql`: Execute SQL commands and return result | (a) Providing schema - Providing the database schemas to the system prompt removed SQL errors altogether <br> (b) Feature engineering - Summarising time / pace by HR zone, identifying races to serve as fitness indicators and adding a weekly summary significantly improved response quality by increasing personalisation / relevance <br> (c) Improving system prompt - Adding specific instructions such as always referring to runs tagged as fitness indicators for a benchmark notably improved response quality. |Answer questions such as fastest / longest runs and report on fitness trends. Provided reasonable training plans, appropriately accounting for current fitness. | `notebooks/0_simplest_agent.ipynb` |
 
 ## 🔧 Setup
 First, set up **Python environment**
@@ -79,10 +86,16 @@ STRAVA_REFRESH_TOKEN=4a822ac443756ff381b712e7444084fd443c0ad2
 
 6. To initialise the SQLite database, check a `data` folder exists (it should if cloning this repo). If not, please create it. Then run the initalisation script
 ```
-python initialise_sqlite_db.py
+python src/utils/initialise_sqlite_db.py
 ```
 
-6. Other
+Then to load in Strava data (if this isn't built into main pipeline yet), this can be done with:
+```
+python src/utils/fetch_from_strava_api.py
+```
+
+
+7. Other
 Please also update `src/config.py` with your personalised HR zones as needed.
 ```
 # Define HR zones
