@@ -204,6 +204,7 @@ def insert_runs_to_db(runs, token):
     conn.commit()
 
     # --- compute weekly_summary ---
+    # basically an ETL step in Python
     # super vibe coded
     df = pd.read_sql_query("SELECT * FROM runs", conn)
 

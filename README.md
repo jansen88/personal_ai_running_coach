@@ -19,6 +19,7 @@ To fill in
         | Agent description | Tools | Improvements made | What it was able to do | Reference |
         | --- | --- | --- | --- | --- |
         | Simple agent, chatbot able to query Strava data | `execute_sql`: Execute SQL commands and return result | (a) Providing schema - Providing the database schemas to the system prompt removed SQL errors altogether <br> (b) Feature engineering - Summarising time / pace by HR zone, identifying races to serve as fitness indicators and adding a weekly summary significantly improved response quality by increasing personalisation / relevance <br> (c) Improving system prompt - Adding specific instructions such as always referring to runs tagged as fitness indicators for a benchmark notably improved response quality. |Answer questions such as fastest / longest runs and report on fitness trends. Provided reasonable training plans, appropriately accounting for current fitness. | `notebooks/0_simplest_agent.ipynb` |
+        | ... | ... | (a) Introduced structured decomposition to plan work i.e. instead of user -> agent -> tool -> answer, user -> planner -> steps -> executor -> tools -> answer | ... | ... |
 
 ## 🔧 Setup
 First, set up **Python environment**
