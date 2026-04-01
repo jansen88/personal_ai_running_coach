@@ -1,0 +1,29 @@
+TABLE: runs
+Columns:
+- id (INTEGER PRIMARY KEY): Strava activity ID
+- name (TEXT): Activity name
+- start_date (TEXT): Start date/time of run (ISO string)
+- distance (REAL): Total distance in km
+- duration (REAL): Total duration in minutes
+- pace (REAL): Average pace per km (min/km)
+- elevation_gain (REAL): Total elevation gain
+- type (TEXT): Strava activity type
+- time_z1, time_z2, time_z3, time_z4, time_z5 (REAL): Minutes in each HR zone
+- pace_z1, pace_z2, pace_z3, pace_z4, pace_z5 (REAL): Avg pace in each HR zone
+- run_type (TEXT): "Base", "Tempo", or "Threshold"
+- is_race (INTEGER): 1 if race, 0 otherwise
+- week_start (TEXT): Monday of the week (YYYY-MM-DD)
+
+TABLE: weekly_summary
+Columns:
+- week_start (TEXT): Monday of the week (YYYY-MM-DD)
+- total_distance (REAL): Sum of distances in that week (km)
+- total_time (REAL): Sum of durations (min)
+- time_easy (REAL): Minutes at Base easy runs
+- time_z3 (REAL): Minutes at Tempo runs (Z3)
+- time_z4_or_5 (REAL): Minutes at Threshold runs (Z4 and Z5)
+- avg_pace_base (REAL): Avg pace of Base runs
+- avg_pace_z3 (REAL): Avg pace of Tempo runs
+- avg_pace_z4_or_5 (REAL): Avg pace of Threshold runs
+- num_races (INTEGER): Number of races in the week
+- race_summary (TEXT): Concatenated race info, e.g., "5K in 19.1min, 10K in 42.3min"
