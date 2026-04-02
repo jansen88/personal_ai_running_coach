@@ -122,20 +122,3 @@ if __name__ == "__main__":
 #         persist_directory="./chroma_db",
 #         embedding_function=embeddings
 #     )
-
-
-# def retrieve_knowledge(vectorstore, query: str, k: int = 3):
-#     results = vectorstore.similarity_search(query, k=k)
-    
-#     return "\n\n".join([
-#         f"{r.page_content} (source: {r.metadata['source']})"
-#         for r in results
-#     ])
-
-
-# from langchain_core.tools import tool
-
-# @tool
-# def retrieve_coaching_knowledge(query: str) -> str:
-#     """Retrieve relevant running coaching knowledge."""
-#     return retrieve_knowledge(query)

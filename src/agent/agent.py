@@ -8,20 +8,19 @@ from langchain_community.utilities import SQLDatabase
 from langchain_core.tools import tool
 from langchain.agents import create_agent
 from langgraph.checkpoint.memory import InMemorySaver
+from langchain_community.vectorstores import Chroma
 
 from langgraph.runtime import get_runtime
-from langchain_openai import ChatOpenAI
-
+from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 
 load_dotenv()
 BASE_DIR = Path('C:/Users/User/Documents/Repositories/personal_ai_running_coach')
 
 
-# ---- Database ----
-# Define SQL database, and context for agent
+# ---- Databases ----
+# -- Define SQL database, and context for agent
 DB_PATH = BASE_DIR / "data" / "strava.db"
 db = SQLDatabase.from_uri(f"sqlite:///{DB_PATH}")
-
 
 @dataclass
 class RuntimeContext:
@@ -30,6 +29,18 @@ class RuntimeContext:
 SUMMARY_PATH = BASE_DIR / "schema_summary.txt"
 with open(SUMMARY_PATH, "r") as f:
     DB_SCHEMA = f.read()
+
+
+# -- Also initialise vector database for knowledge
+CHROMA_DB_PATH = str(BASE_DIR / "data" / "chroma_db")
+
+embeddings = OpenAIEmbeddings()
+
+vectorstore = Chroma(
+    persist_directory=CHROMA_DB_PATH,
+    embedding_function=embeddings
+)
+
 
 
 # ---- Tools for agent ----
@@ -43,7 +54,21 @@ def execute_sql(query: str) -> str:
         return db.run(query)
     except Exception as e:
         return f"Error: {e}"
+
+
+@tool
+def retrieve_knowledge(query: str) -> str:
+    """Retrieve relevant knowledge from knowledge base"""
+    # vectorstore defined in outer scope, might be better way to do this
+    results = vectorstore.similarity_search(query, k=3)
     
+    return "\n\n".join([
+        f"{r.page_content} (source: {r.metadata['source']})"
+        for r in results
+    ])
+
+
+
 # --- System prompt ----
 SYSTEM_PROMPT = f"""
 You are an expert running coach and careful SQLite analyst.
@@ -53,6 +78,8 @@ You have access to a SQLite database of running activities, with two tables - `r
 DATABASE SCHEMA:
 {DB_SCHEMA}
 
+You also have access to a knowledge base with information on HR training zones, and training plans / workouts, that you can access with the tool `retrieve_knowledge`.
+
 Rules:
 - Think step-by-step.
 - When you need data, call the tool `execute_sql` with ONE SELECT query.
@@ -60,7 +87,7 @@ Rules:
 - Always LIMIT results to 5 unless explicitly needed.
 - Prefer explicit column names (avoid SELECT *).
 - If the tool returns 'Error:', fix your SQL and retry.
-- Minimize tool calls, but multiple calls are allowed if needed for reasoning.
+- When you know the correct SQL query, do not call execute_sql more than once per question.
 
 Additional rules on interpreting requests and data:
 - Use the schema to understand:
@@ -70,90 +97,51 @@ Additional rules on interpreting requests and data:
 - Refer to `runs` for full history, and `weekly_summary` for an overview of weekly volume and progress. 
 - Use race performances as a measure of fitness progression, as well as volume and average pace in HR zones.
 - The data is from Strava, and distances and paces may not be exact. Apply a degree of tolerance - e.g. if asked to look at 5K race performance, allow for distance between 4.8 and 5.2.
+- Always respond in kilometres. NEVER respond in miles.
 
 Coaching rules:
 - If receiving a request about training plans or how current fitness might translate, ALWAYS check recent race performances or fastest efforts, to benchmark fitness first. Also consider recent mileage.
 - Be specific and actionable.
+
+Knowledge usage rules:
+- For ANY question involving:
+  - training plans
+  - workouts
+  - heart rate zones
+  - training structure or methodology
+
+You MUST call `retrieve_knowledge` before answering.
+
+- Combined your internal knowledge with retrieved knowledge, preferencing retrieved knowledge.
+- You should combine retrieved knowledge with user-specific data from SQL.
 """
 
-# --- Define agent ---
+
+
+# --- Define and query agent ---
 agent = create_agent(
     model="openai:gpt-4o-mini", 
-    tools=[execute_sql],
+    tools=[execute_sql, retrieve_knowledge],
     system_prompt=SYSTEM_PROMPT,
     context_schema=RuntimeContext,
     checkpointer=InMemorySaver()
 )
 
+def run_agent(agent, question: str):
 
+    for chunk in agent.stream(
+        {"messages": question},
+        {"configurable": {"thread_id": 1}},
+        context=RuntimeContext(db=db),
+        stream_mode="values",
+        max_tokens=300
+    ):
+        msg = chunk["messages"][-1]
+        msg.pretty_print()
+        final_output = msg.content
 
-# ---- Define planner ----
-# create a chat LLM (not another agent) just to do pure reasoning (no tool execution needed)
-# wrapper around the agent to plan what to do first
-planner_llm = ChatOpenAI(model="gpt-4o-mini", temperature=0)
+    return final_output
 
-PLANNER_PROMPT = """
-You are a planning assistant for a running coach AI.
+# question = "YOUR_QUESTION"
 
-Break the user's question into a sequence of steps.
-
-Available tools:
-- execute_sql: retrieve and query structured data
-
-Rules:
-- Keep steps minimal and logical
-- Use tools where needed
-- Final step should be "answer the question"
-
-Return ONLY valid JSON like:
-
-[
-  {{"step": 1, "action": "...", "tool": "..."}},
-  {{"step": 2, "action": "...", "tool": "..."}}
-]
-
-User question: {question}
-"""
-
-
-def create_plan(question: str):
-    response = planner_llm.invoke(
-        PLANNER_PROMPT.format(question=question)
-    )
-    return json.loads(response.content)
-
-
-def run_plan(question: str):
-    plan = create_plan(question)
-
-    print("\n📋 PLAN:")
-    for step in plan:
-        print(step)
-
-    results = []
-
-    # for each step in plan
-    for step in plan:
-        action = step["action"]
-
-        print(f"\n➡️ Step {step['step']}: {action}")
-
-        # for each step in agent's execution
-        for chunk in agent.stream(
-            {"messages": action},
-            {"configurable": {"thread_id": "1"}}, # thread_id manages per-thread state for agents, 1 is fine here
-            context=RuntimeContext(db=db),
-            stream_mode="values",
-            max_tokens=300
-        ):
-            chunk["messages"][-1].pretty_print()
-            # optionally accumulate for later
-            results.append(chunk["messages"][-1].content)
-
-    return results
-
-
-# --- Query agent ----
-question = "YOUR_QUESTION"
-
-run_plan(question)
+run_agent(agent, question)

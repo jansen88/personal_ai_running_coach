@@ -4,22 +4,18 @@ Hobby project creating an AI running coach with personalised training plans usin
 ## Overview
 To fill in
 
-## 🗒️ Detailed notes
-- **API dependencies** - requires API keys for Strava (free) and OpenAI (paid)
-    - Note # of API calls to Strava is N+1, where N is number of runs fetched as we need the more detailed HR data per run
-    - I didn't set this up to use other models or servers, but obviously this could be done.
-- **Preprocessing of Strava data** - dictionary returned from API is saved as SQLite database
-    - SQLite database enables standardised, performant querying by agent
-    - Data dictionary - See `database_schema.json` for schema. This is passed to the agent.
-    - Data on time / pace by HR zone:
-        - HR zones configured in `src/config.py`
-        - Some (vibe coded) effort has gone into summarising statistics by HR zone, to provide better information for the agent to work with.
-- **Agent**
-    - Development log:
-        | Agent description | Tools | Improvements made | What it was able to do | Reference |
-        | --- | --- | --- | --- | --- |
-        | Simple agent, chatbot able to query Strava data | `execute_sql`: Execute SQL commands and return result | (a) Providing schema - Providing the database schemas to the system prompt removed SQL errors altogether <br> (b) Feature engineering - Summarising time / pace by HR zone, identifying races to serve as fitness indicators and adding a weekly summary significantly improved response quality by increasing personalisation / relevance <br> (c) Improving system prompt - Adding specific instructions such as always referring to runs tagged as fitness indicators for a benchmark notably improved response quality. |Answer questions such as fastest / longest runs and report on fitness trends. Provided reasonable training plans, appropriately accounting for current fitness. | `notebooks/0_simplest_agent.ipynb` |
-        | ... | ... | (a) Introduced structured decomposition to plan work i.e. instead of user -> agent -> tool -> answer, user -> planner -> steps -> executor -> tools -> answer | ... | ... |
+## 🗒️ Development log
+- Initialised agent with basic tool `execute_sql` to execute SQL commands and return result
+- Prompt tuning
+    - Providing the database schema to system prompt removed SQL errors entirely
+    - Adding specific instructions to refer to runs tagged as fitness indicators for benchmarks, or allow for tolerance in run distances (4.98km is a 5k) added a layer of human heuristics which improved results
+- Feature engineering: refining the information provided to the agent by summarising time / pace in HR zone to better reflect training load, tagging races to serve as fitness indicators and adding weekly summaries to more easily extract views of progress significantly improved response quality (more personalised, less generic) 
+- Tested separated planning (decomposition of question into distinct tasks first) into a separate LLM call, as an attempt at more complex orchestration. Did not perform well as <br>
+    (a) key information from the system prompt was being lost and in the planner prompt <br>
+    (b) more overhead was needed to ensure the agent was clear on the overall plan at each step, and <br>
+    (c) error handling also required additional overhead i.e. if SQL error, need to run more steps so needed to override the original plan. <br>
+My experience was that for this task, the agent was already independently managing the required steps well, and didn't need the planning separated, so I abandoned this.
+- Added knowledge base with articles on HR training zones, training plans and workouts. Implemented simple RAG system by fetching text from web pages, chunking and saving embeddings to vector database, and prompting agent to retrieve from knowledge base as needed.
 
 ## 🔧 Setup
 First, set up **Python environment**
