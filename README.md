@@ -30,6 +30,11 @@ My experience was that for this task, the agent was already independently managi
     - gpt-5.4-nano: Much better reasoning, but ignores my instructions!
     - gpt-5.4-mini: Did better job of following instructions and reasoning (sensible plan), but more expensive.
 
+Other ideas
+- Functionality to save down training plans in standardised format, and track training against
+- Long-term memory for goals, races etc.
+- Weather API - especially in summer, training plans vary a lot depending on heat / humidity! My workout will definitely be slower if its hot!
+
 ## 🔧 Setup
 First, set up **Python environment**
 For Windows and in Bash, change directory to this repo and:
