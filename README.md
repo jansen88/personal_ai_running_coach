@@ -2,23 +2,38 @@
 Hobby project creating an AI running coach with personalised training plans using my Strava data. The purpose of this was for personal use, and also as a practical hobby exercise working with LangChain.
 
 ## Overview
-To fill in
+This is an LLM application, which acts as an AI running companion by analysing your Strava data, providing insights on your fitness, and providing personalised running plans.
 
-## 🗒️ Detailed notes
-- **API dependencies** - requires API keys for Strava (free) and OpenAI (paid)
-    - Note # of API calls to Strava is N+1, where N is number of runs fetched as we need the more detailed HR data per run
-    - I didn't set this up to use other models or servers, but obviously this could be done.
-- **Preprocessing of Strava data** - dictionary returned from API is saved as SQLite database
-    - SQLite database enables standardised, performant querying by agent
-    - Data dictionary - See `database_schema.json` for schema. This is passed to the agent.
-    - Data on time / pace by HR zone:
-        - HR zones configured in `src/config.py`
-        - Some (vibe coded) effort has gone into summarising statistics by HR zone, to provide better information for the agent to work with.
-- **Agent**
-    - Development log:
-        | Agent description | Tools | Improvements made | What it was able to do | Reference |
-        | --- | --- | --- | --- | --- |
-        | Simple agent, chatbot able to query Strava data | `execute_sql`: Execute SQL commands and return result | (a) Providing schema - Providing the database schemas to the system prompt removed SQL errors altogether <br> (b) Feature engineering - Summarising time / pace by HR zone, identifying races to serve as fitness indicators and adding a weekly summary significantly improved response quality by increasing personalisation / relevance <br> (c) Improving system prompt - Adding specific instructions such as always referring to runs tagged as fitness indicators for a benchmark notably improved response quality. |Answer questions such as fastest / longest runs and report on fitness trends. Provided reasonable training plans, appropriately accounting for current fitness. | `notebooks/0_simplest_agent.ipynb` |
+The application consists of an AI agent with tools to execute queries on a SQLite database (structured data from Strava API), and retrieve relevant training informatoin from a knowledge base of curated web articles. The user interacts with the AI agent through a Streamlit app interface. 
+
+The application is a working MVP, and could be further improved (see development log below).
+
+You will need to set up OpenAI and Strava API keys (obviously) to run this - see setup instructions below.
+
+
+## 🗒️ Development log
+- Initialised agent with basic tool `execute_sql` to execute SQL commands and return result
+- Prompt tuning
+    - Providing the database schema to system prompt removed SQL errors entirely
+    - Adding specific instructions to refer to runs tagged as fitness indicators for benchmarks, or allow for tolerance in run distances (4.98km is a 5k) added a layer of human heuristics which improved results
+    - ChatGPT quite good at generating improved prompt when specific issue raised
+- Feature engineering: refining the information provided to the agent by summarising time / pace in HR zone to better reflect training load, tagging races to serve as fitness indicators and adding weekly summaries to more easily extract views of progress significantly improved response quality (more personalised, less generic) 
+- Tested separated planning (decomposition of question into distinct tasks first) into a separate LLM call, as an attempt at more complex orchestration. Did not perform well as <br>
+    (a) key information from the system prompt was being lost and in the planner prompt <br>
+    (b) more overhead was needed to ensure the agent was clear on the overall plan at each step, and <br>
+    (c) error handling also required additional overhead i.e. if SQL error, need to run more steps so needed to override the original plan. <br>
+My experience was that for this task, the agent was already independently managing the required steps well, and didn't need the planning separated, so I abandoned this.
+- Added knowledge base with articles on HR training zones, training plans and workouts. Implemented simple RAG system by fetching text from web pages, chunking and saving embeddings to vector database, and prompting agent to retrieve from knowledge base as needed via the tool `retrieve_knowledge`.
+    - I think could improve the agent a lot by choosing the right articles, with most relevant training approaches to what I have been following. Could directly include good training plans for 5K, HM, Marathon etc. to produce good specific recommendations.
+- Choice of model
+    - gpt-4o-mini: Seems to be very good at instruction following. Reasoning is weaker - notice this in training plans
+    - gpt-5.4-nano: Much better reasoning, but ignores my instructions!
+    - gpt-5.4-mini: Did better job of following instructions and reasoning (sensible plan), but more expensive.
+
+Other ideas
+- Functionality to save down training plans in standardised format, and track training against
+- Long-term memory for goals, races etc.
+- Weather API - especially in summer, training plans vary a lot depending on heat / humidity! My workout will definitely be slower if its hot!
 
 ## 🔧 Setup
 First, set up **Python environment**
@@ -84,14 +99,18 @@ STRAVA_REFRESH_TOKEN=4a822ac443756ff381b712e7444084fd443c0ad2
     print(res.json())
     ```
 
-6. To initialise the SQLite database, check a `data` folder exists (it should if cloning this repo). If not, please create it. Then run the initalisation script
+6. **Initialise databases** if needed
+- To initialise the SQLite database, check a `data` folder exists (it should if cloning this repo). If not, please create it. Then run the initalisation script
 ```
 python src/utils/initialise_sqlite_db.py
 ```
-
-Then to load in Strava data (if this isn't built into main pipeline yet), this can be done with:
+- To initialise the SQLite database for Strava data (this will get built into the agent, but can also be done manually):
 ```
 python src/utils/fetch_from_strava_api.py
+```
+- To initialise the Chroma vector database of running knowledge (from web pages):
+```
+python src/utils/create_vector_store.py
 ```
 
 

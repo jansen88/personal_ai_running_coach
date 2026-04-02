@@ -24,7 +24,7 @@ Other optional higher effort use cases:
 
 ## Tools
 Thinking about the tools our agent needs to have access to, in order to be able to fulfil above use case:
-- Strava API tool
+- Strava API tool [Pre-load the data, but give agent option to update]
     - Need to look into how to set this up, what info available, and how to structure it
     - Also need to think about how to manage the info we get such that token consumption is reasonable i.e. don't pull ALL historic data, format etc
 - Weather API tool
@@ -33,6 +33,8 @@ Thinking about the tools our agent needs to have access to, in order to be able 
     - For the agent to be able to query the data - probably SQLite db + SQL
 - Planner tool
     - Outputs structured weekly schedules in standard format??
+- RAG tool 
+    - Take some quality articles / information on training, and save to vector store for agent to retrieve relevant information from
 
 ## Reasoning loop
 Want to have agent work something like the below:
