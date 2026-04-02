@@ -6,7 +6,7 @@ Hobby project creating an AI running coach with personalised training plans usin
 ## Overview
 This is an LLM application, which acts as an AI running companion by analysing your Strava data, providing insights on your fitness, and providing personalised running plans.
 
-The application consists of an AI agent with tools to execute queries on a SQLite database (structured data from Strava API), and retrieve relevant training informatoin from a knowledge base of curated web articles. The user interacts with the AI agent through a Streamlit app interface. 
+The application consists of an AI agent with tools to execute queries on a SQLite database (structured data from Strava API), and retrieve relevant training information from a knowledge base of curated web articles. The user interacts with the AI agent through a Streamlit app interface. 
 
 The application is a working MVP, and could be further improved (see development log below).
 
