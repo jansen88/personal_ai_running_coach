@@ -2,20 +2,33 @@
 Hobby project creating an AI running coach with personalised training plans using my Strava data. The purpose of this was for personal use, and also as a practical hobby exercise working with LangChain.
 
 ## Overview
-To fill in
+This is an LLM application, which acts as an AI running companion by analysing your Strava data, providing insights on your fitness, and providing personalised running plans.
+
+The application consists of an AI agent with tools to execute queries on a SQLite database (structured data from Strava API), and retrieve relevant training informatoin from a knowledge base of curated web articles. The user interacts with the AI agent through a Streamlit app interface. 
+
+The application is a working MVP, and could be further improved (see development log below).
+
+You will need to set up OpenAI and Strava API keys (obviously) to run this - see setup instructions below.
+
 
 ## 🗒️ Development log
 - Initialised agent with basic tool `execute_sql` to execute SQL commands and return result
 - Prompt tuning
     - Providing the database schema to system prompt removed SQL errors entirely
     - Adding specific instructions to refer to runs tagged as fitness indicators for benchmarks, or allow for tolerance in run distances (4.98km is a 5k) added a layer of human heuristics which improved results
+    - ChatGPT quite good at generating improved prompt when specific issue raised
 - Feature engineering: refining the information provided to the agent by summarising time / pace in HR zone to better reflect training load, tagging races to serve as fitness indicators and adding weekly summaries to more easily extract views of progress significantly improved response quality (more personalised, less generic) 
 - Tested separated planning (decomposition of question into distinct tasks first) into a separate LLM call, as an attempt at more complex orchestration. Did not perform well as <br>
     (a) key information from the system prompt was being lost and in the planner prompt <br>
     (b) more overhead was needed to ensure the agent was clear on the overall plan at each step, and <br>
     (c) error handling also required additional overhead i.e. if SQL error, need to run more steps so needed to override the original plan. <br>
 My experience was that for this task, the agent was already independently managing the required steps well, and didn't need the planning separated, so I abandoned this.
-- Added knowledge base with articles on HR training zones, training plans and workouts. Implemented simple RAG system by fetching text from web pages, chunking and saving embeddings to vector database, and prompting agent to retrieve from knowledge base as needed.
+- Added knowledge base with articles on HR training zones, training plans and workouts. Implemented simple RAG system by fetching text from web pages, chunking and saving embeddings to vector database, and prompting agent to retrieve from knowledge base as needed via the tool `retrieve_knowledge`.
+    - I think could improve the agent a lot by choosing the right articles, with most relevant training approaches to what I have been following. Could directly include good training plans for 5K, HM, Marathon etc. to produce good specific recommendations.
+- Choice of model
+    - gpt-4o-mini: Seems to be very good at instruction following. Reasoning is weaker - notice this in training plans
+    - gpt-5.4-nano: Much better reasoning, but ignores my instructions!
+    - gpt-5.4-mini: Did better job of following instructions and reasoning (sensible plan), but more expensive.
 
 ## 🔧 Setup
 First, set up **Python environment**
