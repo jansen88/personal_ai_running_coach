@@ -75,9 +75,9 @@ os.getenv("OPENAI_API_KEY")
 - Get Strava API key from [here](https://developers.strava.com/)
 - Add to .env file
 ```
-STRAVA_CLIENT_ID=218981
-STRAVA_CLIENT_SECRET=eebd6d8728726e3f3b4eae612791a0002d6b5a4a
-STRAVA_REFRESH_TOKEN=4a822ac443756ff381b712e7444084fd443c0ad2
+STRAVA_CLIENT_ID=xxx
+STRAVA_CLIENT_SECRET=xxxx
+STRAVA_REFRESH_TOKEN=xxxx
 ```
 - There were some extra steps I had to follow to get a valid refresh token:
     - Open URL below in browser, replacing Client ID
