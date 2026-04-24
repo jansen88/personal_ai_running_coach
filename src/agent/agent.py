@@ -17,6 +17,19 @@ load_dotenv()
 BASE_DIR = Path('C:/Users/User/Documents/Repositories/personal_ai_running_coach')
 
 
+# QUICK FIX - some SSL cert issues
+import os
+
+# Nuke anything SSL-related
+os.environ.pop("SSL_CERT_FILE", None)
+os.environ.pop("REQUESTS_CA_BUNDLE", None)
+os.environ.pop("CURL_CA_BUNDLE", None)
+
+# Force a valid cert bundle
+import certifi
+os.environ["SSL_CERT_FILE"] = certifi.where()
+
+
 # ---- Databases ----
 # -- Define SQL database, and context for agent
 DB_PATH = BASE_DIR / "data" / "strava.db"
@@ -156,11 +169,12 @@ You MUST:
 ---
 
 COACHING RULES
-
-- ALWAYS benchmark fitness using:
-  - recent race performances OR
-  - fastest efforts
-- Also consider recent mileage and trends
+- ALWAYS first determine:
+  - Current fitness level and race paces from available data (recent RACE, or hard effort, taking care to distinguish from easy runs)
+    - If being asked to provide a training plan over a specific distance e.g. marathon which has not recently been run, consider equivalent times using the VDOT system
+    - Always compare current fitness level to targeted goal time, or realistic progress over training plan time
+  - Current volume, consisting of weekly mileage, trends and consistency of mileage, and intensity (number of workouts per week)
+  - Days of week and number of days the user currently trains per week. Recommend additional training days as needed
 - Be specific, practical, and actionable
 
 ---
@@ -234,7 +248,7 @@ FINAL ANSWERS
 
 #     return final_output
 
-# question = "YOUR_QUESTION"
+# question = "What is my fastest recent 5K time?"
 
 # run_agent(agent, question)
 
