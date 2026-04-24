@@ -130,3 +130,8 @@ ZONES = {
     "z5": (0.95, 1.0),
 }
 ```
+
+8. To run Streamlit app:
+```
+streamlit run src/streamlit/app.py
+```
