@@ -1,15 +1,16 @@
 # Personalised AI Running Coach
 Hobby project creating an AI running coach with personalised training plans using my Strava data. The purpose of this was for personal use, and also as a practical hobby exercise working with LangChain.
 
+<img width="1617" height="837" alt="image" src="https://github.com/user-attachments/assets/caf1b5fe-6173-447b-a324-d97a325243cb" />
+
 ## Overview
 This is an LLM application, which acts as an AI running companion by analysing your Strava data, providing insights on your fitness, and providing personalised running plans.
 
-The application consists of an AI agent with tools to execute queries on a SQLite database (structured data from Strava API), and retrieve relevant training informatoin from a knowledge base of curated web articles. The user interacts with the AI agent through a Streamlit app interface. 
+The application consists of an AI agent with tools to execute queries on a SQLite database (structured data from Strava API), and retrieve relevant training information from a knowledge base of curated web articles. The user interacts with the AI agent through a Streamlit app interface. 
 
 The application is a working MVP, and could be further improved (see development log below).
 
 You will need to set up OpenAI and Strava API keys (obviously) to run this - see setup instructions below.
-
 
 ## 🗒️ Development log
 - Initialised agent with basic tool `execute_sql` to execute SQL commands and return result
@@ -75,8 +76,8 @@ os.getenv("OPENAI_API_KEY")
 - Add to .env file
 ```
 STRAVA_CLIENT_ID=xxx
-STRAVA_CLIENT_SECRET=xxx
-STRAVA_REFRESH_TOKEN=xxx
+STRAVA_CLIENT_SECRET=xxxx
+STRAVA_REFRESH_TOKEN=xxxx
 ```
 - There were some extra steps I had to follow to get a valid refresh token:
     - Open URL below in browser, replacing Client ID
